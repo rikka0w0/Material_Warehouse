@@ -12,6 +12,18 @@ public class MaterialWarehouse {
 	public static final String modName = "Material Warehouse";
 	public static final String version = "1.0";
 	
+	/*This will register items and blocks: 
+	 * Block/Item name: ingot_copper, block0
+	 * oreDict name: ingotCopper, blockCopper
+	 * texture: items/ingot_copper.png, blocks/blockCopper
+	 * language string:
+	 * item.material_warehouse:ingot_copper.name=My Copper Ingot
+	 * tile.material_warehouse:block_iron.name=My Iron Block
+	*/
+	public static String[] itemPrefixes = new String[]{"ingot", "dust"};
+	public static String[] blockPrefixes = new String[]{"ore", "block"};
+	public static String[] suffixes = new String[]{"copper", "aluminum", "lead", "coal", "diamond", "gold", "iron", "redstone"};
+	
     @Instance(MaterialWarehouse.modID)
     public static MaterialWarehouse instance;
     

@@ -3,3 +3,6 @@ itemGroup.material_warehouse=Material Warehouse
 
 # Blocks
 tile.material_warehouse:block_iron.name=My Iron Block
+
+# Items
+item.material_warehouse:ingot_copper.name=My Copper Ingot

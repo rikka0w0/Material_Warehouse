@@ -22,27 +22,30 @@ import net.minecraftforge.common.model.TRSRTransformation;
  * A block variant has the same texture for all 6 sides
  * @author Rikka0_0
  */
-public class SimpleBlockVariant extends Variant implements ISmartVariant{
+public class SingleTextureVariant extends Variant implements ISmartVariant{
+	private static final ResourceLocation generated = new ResourceLocation("minecraft:item/generated");
 	private static final ResourceLocation cube_all = new ResourceLocation("minecraft:block/cube_all");
 	
     private final ImmutableMap<String, String> textures;
     private final ImmutableMap<String, String> customData;
     private final IModelState state;
+    private final boolean isGui3d;
     
-    public SimpleBlockVariant(String texture){
-    	this(TRSRTransformation.identity(), texture);
+    public SingleTextureVariant(String texture, boolean isBlock){
+    	this(TRSRTransformation.identity(), texture, isBlock);
     }
     
-    private SimpleBlockVariant(IModelState state, String texture) {
-		super(cube_all
+    private SingleTextureVariant(IModelState state, String texture, boolean isBlock) {
+		super(isBlock?cube_all:generated
 			, state instanceof ModelRotation ? (ModelRotation)state : ModelRotation.X0_Y0
 			, false, 1);	//uvLock = false, weight always 1
 		
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-		builder.put("all", texture);
+		builder.put(isBlock?"all":"layer0", texture);
 		this.textures = builder.build();
 		this.customData = ImmutableMap.copyOf(new HashMap<String, String>());
         this.state = state;
+        this.isGui3d = isBlock;
 	}
 
     @Override
@@ -68,6 +71,6 @@ public class SimpleBlockVariant extends Variant implements ISmartVariant{
     	//ImmutableMap<String, String> customData
     	
     	//						smooth=gui3d=true
-    	return runModelHooks(base, true, true, this.isUvLock(), textures, customData);
+    	return runModelHooks(base, true, isGui3d, this.isUvLock(), textures, customData);
     }
 }

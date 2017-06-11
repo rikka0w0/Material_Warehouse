@@ -5,17 +5,17 @@ import com.ymcmod.materialwarehouse.MaterialWarehouse;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 
-public class SimpleTextureItemBlock extends GenericItemBlock{
-	public SimpleTextureItemBlock(Block block, boolean useless) {
+public final class SingleTextureItemBlock extends GenericItemBlock{
+	public SingleTextureItemBlock(Block block, boolean useless) {
 		super(block, true);
 
-        if (!(block instanceof SimpleTextureBlock))
-        	throw new RuntimeException("SimpleTextureItemBlock should be used with SimpleTextureBlock!");
+        if (!(block instanceof SingleTextureBlock))
+        	throw new RuntimeException("SingleTextureItemBlock should be used with SingleTextureBlock!");
 	}
 
     @Override
     public final String getUnlocalizedName(ItemStack itemstack) {
-    	SimpleTextureBlock block = (SimpleTextureBlock)this.block;
+    	SingleTextureBlock block = (SingleTextureBlock)this.block;
     	return "tile." + block.getBlockName()+ "_" + block.getSubBlockUnlocalizedNames()[itemstack.getItemDamage()];
     }
 }

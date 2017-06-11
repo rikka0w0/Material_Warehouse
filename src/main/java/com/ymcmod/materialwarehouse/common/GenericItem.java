@@ -8,21 +8,13 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class GenericItem extends Item{
 	public static final LinkedList<GenericItem> registeredItems = new LinkedList();
-	
-	@SideOnly(Side.CLIENT)
-	public Object bakedQuadsCache;
-	protected String[] subNames;
-	
-	public GenericItem(String name) {
-		this(name, null);
-	}
+	protected final String[] subNames;
 	
 	/**
 	 * 
@@ -77,22 +69,5 @@ public class GenericItem extends Item{
      */
     public String[] getSubItemUnlocalizedNames(){
     	return subNames;
-    }
-    
-    /**
-     * Only valid for subItems
-     * 
-     * @return an array of texture paths
-     */
-    @SideOnly(Side.CLIENT)
-    public String[] getTexturePaths(){
-    	String[] ret = new String[subNames.length];
-    	ResourceLocation res = this.getRegistryName();
-    	String domain = res.getResourceDomain();
-    	String path = res.getResourcePath();
-    	for (int i = 0; i<subNames.length; i++){
-    		ret[i] = domain + ":items/" + path + "_" + subNames[i];;
-    	}
-    	return ret;
     }
 }

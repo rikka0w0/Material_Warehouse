@@ -17,16 +17,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * Texture file: blockName_subName.png, ModelResourceLocation: simple_texture_block_setName_blockIndex_meta
  * @author Rikka0_0
  */
-public final class SimpleTextureBlock extends GenericMetaBlock{
+public final class SingleTextureBlock extends GenericMetaBlock{
 	public static final class Set{
-		private static final LinkedList<SimpleTextureBlock.Set> registeredSTBSets = new LinkedList();
+		private static final LinkedList<SingleTextureBlock.Set> registeredSTBSets = new LinkedList();
 		
-		public static final Iterator<SimpleTextureBlock.Set> iterator(){
+		public static final Iterator<SingleTextureBlock.Set> iterator(){
 			return registeredSTBSets.iterator();
 		}
 		
 		private final String name;	//ore, chunk
-		private final LinkedList<SimpleTextureBlock> blocks;
+		private final LinkedList<SingleTextureBlock> blocks;
 		private final CreativeTabs tab;
 		
 		public Set(String name, String[] subNames, Material material, CreativeTabs tab){
@@ -45,20 +45,40 @@ public final class SimpleTextureBlock extends GenericMetaBlock{
 					subNameSection[i] = subNames[blockIndex*16 + i];
 				
 				//block state json = name_blockIndex
-				SimpleTextureBlock stb= 
-						SimpleTextureBlock.create(this, name, blockIndex, subNameSection, material);
+				SingleTextureBlock stb= 
+						SingleTextureBlock.create(this, name, blockIndex, subNameSection, material);
 				blocks.add(stb);
 			}
 			
 			registeredSTBSets.add(this);
 		}
 		
-		public Iterator<SimpleTextureBlock> blockIterator(){
+		public Iterator<SingleTextureBlock> blockIterator(){
 			return this.blocks.iterator();
 		}
 		
 		public String getName(){
 			return this.name;
+		}
+		
+		/**
+		 * Meta < 16, max 15 (0x0F)
+		 */
+		public int getMeta(int i){
+			return i&15;
+		}
+		
+		public SingleTextureBlock getBlock(int i){
+			int counter = 0;
+			SingleTextureBlock ret = null;
+			
+			for (SingleTextureBlock block: blocks){
+				ret = block;
+				if (counter >= i>>4)
+					break;
+			}
+			
+			return ret;
 		}
 	}
 	
@@ -71,23 +91,23 @@ public final class SimpleTextureBlock extends GenericMetaBlock{
 	 */
 	private static int subNamesLengthCache;
 	
-	private final SimpleTextureBlock.Set parent;
+	private final SingleTextureBlock.Set parent;
 	private final String blockName;
 	private final int index;
 	
-	private static SimpleTextureBlock create(SimpleTextureBlock.Set parent, String name, int blockIndex, String[] subNames, Material material){
+	private static SingleTextureBlock create(SingleTextureBlock.Set parent, String name, int blockIndex, String[] subNames, Material material){
 		subNamesLengthCache = subNames.length;
-		SimpleTextureBlock instance = new SimpleTextureBlock(parent, name, blockIndex, subNames, material);
+		SingleTextureBlock instance = new SingleTextureBlock(parent, name, blockIndex, subNames, material);
 		return instance;
 	}
 	
-	private SimpleTextureBlock(SimpleTextureBlock.Set parent, String name, int blockIndex, String[] subNames, Material material) {
-		super(name + "_" + String.valueOf(blockIndex), subNames, SimpleTextureItemBlock.class, material);
+	private SingleTextureBlock(SingleTextureBlock.Set parent, String name, int blockIndex, String[] subNames, Material material) {
+		super(name + "_" + String.valueOf(blockIndex), subNames, SingleTextureItemBlock.class, material);
 		this.setCreativeTab(parent.tab);
 		this.blockName = name;
 		this.parent = parent;
-		index = count;
-		count++;
+		this.index = count;
+		this.count++;
 	}
 
 	@Override
@@ -100,7 +120,7 @@ public final class SimpleTextureBlock extends GenericMetaBlock{
 	}
 	
 	public String getBlockName(){
-		return blockName;
+		return this.blockName;
 	}
 	
 	/**
@@ -123,7 +143,7 @@ public final class SimpleTextureBlock extends GenericMetaBlock{
 	public void updateTexturePaths(){
 		texturePaths[index] = new String[subNames.length];
 		for (int i=0; i<subNames.length; i++)
-			texturePaths[index][i] = MaterialWarehouse.modID + ":blocks/" + this.blockName + "_" + this.subNames[i];
+			texturePaths[index][i] = this.blockName + "_" + this.subNames[i];
 	}
 	
 	@SideOnly(Side.CLIENT)

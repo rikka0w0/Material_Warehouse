@@ -1,8 +1,9 @@
 package com.ymcmod.materialwarehouse.client;
 
 import com.ymcmod.materialwarehouse.MaterialWarehouse;
-import com.ymcmod.materialwarehouse.client.model.SimpleBlockModel;
-import com.ymcmod.materialwarehouse.common.SimpleTextureBlock;
+import com.ymcmod.materialwarehouse.client.model.SingleTextureModel;
+import com.ymcmod.materialwarehouse.common.SingleTextureBlock;
+import com.ymcmod.materialwarehouse.common.SingleTextureItem;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.IResourceManager;
@@ -14,6 +15,7 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 public class CustomModelLoader implements ICustomModelLoader{	
 	public static final String STBBlockState = "stb";
 	public static final String invSTBBlockState = "fakeinv_stb";
+	public static final String invSTI = "fakeinv_sti";
 	public static final CustomModelLoader instance = new CustomModelLoader();
 	
 	
@@ -26,7 +28,7 @@ public class CustomModelLoader implements ICustomModelLoader{
 	}
 
 	@Override
-	public boolean accepts(ResourceLocation modelLocation) {
+	public boolean accepts(ResourceLocation modelLocation) {		
 		if (!modelLocation.getResourceDomain().equals(MaterialWarehouse.modID))
 			return false;
 		
@@ -40,6 +42,9 @@ public class CustomModelLoader implements ICustomModelLoader{
 				resPath = resPath.substring(12);
 			
 			if (resPath.startsWith(invSTBBlockState))
+				return true;
+			
+			if (resPath.startsWith(invSTI))
 				return true;
 		}
 			
@@ -57,7 +62,7 @@ public class CustomModelLoader implements ICustomModelLoader{
 			int meta = Integer.parseInt(vars[0].substring(5));
 			int tindex= Integer.parseInt(vars[1].substring(7));
 			
-			return new SimpleBlockModel(SimpleTextureBlock.texturePaths[tindex][meta]);
+			return new SingleTextureModel(SingleTextureBlock.texturePaths[tindex][meta], true);
 		}else{
 			if (resPath.startsWith("models/item/"))
 				resPath = resPath.substring(12);
@@ -67,7 +72,15 @@ public class CustomModelLoader implements ICustomModelLoader{
 				String[] vars = resPath.split("_");
 				int tindex = Integer.parseInt(vars[0]);
 				int meta = Integer.parseInt(vars[1]);
-				return new SimpleBlockModel(SimpleTextureBlock.texturePaths[tindex][meta]);
+				return new SingleTextureModel(SingleTextureBlock.texturePaths[tindex][meta], true);
+			}
+			
+			if (resPath.startsWith(invSTI)){
+				resPath = resPath.substring(invSTI.length()+1);
+				String[] vars = resPath.split("_");
+				int index = Integer.parseInt(vars[0]);
+				int meta = Integer.parseInt(vars[1]);
+				return new SingleTextureModel(SingleTextureItem.texturePaths[index][meta], false);
 			}
 		}
 		

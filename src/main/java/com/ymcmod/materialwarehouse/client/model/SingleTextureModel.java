@@ -11,6 +11,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.ymcmod.materialwarehouse.MaterialWarehouse;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.Variant;
@@ -23,15 +24,16 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.MultiModelState;
 import net.minecraftforge.common.model.IModelState;
 
-public class SimpleBlockModel implements IModel{
+public class SingleTextureModel implements IModel{
 	private final List<ResourceLocation> locations = new ArrayList<ResourceLocation>();
     private final Set<ResourceLocation> textures = Sets.newHashSet();
     private final IModel model;
     private final IModelState defaultState;
 	
-    //parent = material_warehouse:demo_block#meta=0
-	public SimpleBlockModel(String texture) throws Exception{
-		Variant variant = new SimpleBlockVariant(texture);
+	public SingleTextureModel(String texture, boolean isBlock) throws Exception{
+		texture = MaterialWarehouse.modID + ":" + (isBlock ? "blocks/":"items/") + texture;
+		
+		Variant variant = new SingleTextureVariant(texture, isBlock);
 		ResourceLocation loc = variant.getModelLocation();
         locations.add(loc);
         

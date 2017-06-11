@@ -3,3 +3,6 @@ itemGroup.material_warehouse=Material Warehouse
 
 # Blocks
 tile.material_warehouse:block_iron.name=大铁块
+
+# Items
+item.material_warehouse:ingot_copper.name=假的铜锭

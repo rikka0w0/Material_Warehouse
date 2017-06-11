@@ -2,8 +2,6 @@ package com.ymcmod.materialwarehouse.client;
 
 import com.ymcmod.materialwarehouse.CommonProxy;
 import com.ymcmod.materialwarehouse.common.GenericBlock;
-import com.ymcmod.materialwarehouse.common.GenericItem;
-import com.ymcmod.materialwarehouse.common.SimpleTextureBlock;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.statemap.StateMap;
@@ -28,18 +26,7 @@ public class ClientProxy extends CommonProxy{
 	public void registerRenders() {		
 		ModelLoaderRegistry.registerLoader(CustomModelLoader.instance);
 		
-		//for (GenericItem item: GenericItem.registeredItems){
-		//	new GenericItemMeshDefinition(item);
-		//}
-		
-		//for (GenericBlock block: GenericBlock.registeredBlocks){
-			//ModelLoader.setCustomStateMapper(block, (new StateMap.Builder()).ignore(BlockSet.pIntMeta).build());
-			//ModelLoader.setCustomStateMapper(block, new CustomStateMapper());
-		//	new ItemBlockMeshDefinition(block);
-		//}
-		
-		SimpleTextureItemBlockMeshDefinition.regsterItemMeshDefinitionForSets();
-		
-		MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
+		SingleTextureMeshDefinition.registerForItemBlocks();
+		SingleTextureMeshDefinition.registerForItems();
 	}
 }
