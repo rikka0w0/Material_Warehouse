@@ -3,7 +3,6 @@ package com.ymcmod.materialwarehouse;
 import com.ymcmod.materialwarehouse.common.SingleTextureBlock;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -16,7 +15,7 @@ public class BlockRegistry {
 			String prefix = MaterialWarehouse.blockPrefixes[i];
 			
 			SingleTextureBlock.Set set = new SingleTextureBlock.Set(prefix, MaterialWarehouse.suffixes,
-					 Material.ROCK, CreativeTabs.TRANSPORTATION);
+					 Material.ROCK, MaterialWarehouse.creativeTab);
 			
 			//Register oreDict
 			for (int j=0; j<MaterialWarehouse.suffixes.length; j++){

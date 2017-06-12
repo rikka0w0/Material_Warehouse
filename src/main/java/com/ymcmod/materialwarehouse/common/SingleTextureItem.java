@@ -6,12 +6,6 @@ import java.util.LinkedList;
 import com.ymcmod.materialwarehouse.MaterialWarehouse;
 import com.ymcmod.materialwarehouse.client.CustomModelLoader;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 

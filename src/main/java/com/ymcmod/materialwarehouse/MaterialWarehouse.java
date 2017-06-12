@@ -1,5 +1,6 @@
 package com.ymcmod.materialwarehouse;
 
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -20,9 +21,9 @@ public class MaterialWarehouse {
 	 * item.material_warehouse:ingot_copper.name=My Copper Ingot
 	 * tile.material_warehouse:block_iron.name=My Iron Block
 	*/
-	public static String[] itemPrefixes = new String[]{"ingot", "dust"};
-	public static String[] blockPrefixes = new String[]{"ore", "block"};
-	public static String[] suffixes = new String[]{"copper", "aluminum", "lead", "coal", "diamond", "gold", "iron", "redstone"};
+	public static String[] itemPrefixes = new String[]{"ingot", "plate", "dust", "dustSmall", "dustTiny", "nugget", "crushed"};
+	public static String[] blockPrefixes = new String[]{};
+	public static String[] suffixes = new String[]{"copper", "tin", "silver", "nickel", "tungsten", "platinum", "titanium", "magnesium", "aluminum", "uranium", "iridium"};
 	
     @Instance(MaterialWarehouse.modID)
     public static MaterialWarehouse instance;
@@ -30,8 +31,12 @@ public class MaterialWarehouse {
     @SidedProxy(clientSide="com.ymcmod.materialwarehouse.client.ClientProxy", serverSide="com.ymcmod.materialwarehouse.CommonProxy") 
     public static CommonProxy proxy;
     
+    public static CreativeTabs creativeTab;
+    
     @EventHandler
     public void preInit(FMLPreInitializationEvent event){
+    	creativeTab = new CreativeTab();
+    	
     	ItemRegistry.preInit();
     	BlockRegistry.preInit();
     	

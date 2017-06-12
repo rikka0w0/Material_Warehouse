@@ -15,7 +15,6 @@ import com.ymcmod.materialwarehouse.MaterialWarehouse;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.Variant;
-import net.minecraft.client.renderer.block.model.VariantList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
