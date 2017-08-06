@@ -1,11 +1,11 @@
 package com.ymcmod.materialwarehouse;
 
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = MaterialWarehouse.modID, name = MaterialWarehouse.modName, version = MaterialWarehouse.version)
 public class MaterialWarehouse {
@@ -22,7 +22,7 @@ public class MaterialWarehouse {
 	 * tile.material_warehouse:block_iron.name=My Iron Block
 	*/
 	public static String[] itemPrefixes = new String[]{"ingot", "plate", "dust", "dustSmall", "dustTiny", "nugget", "crushed"};
-	public static String[] blockPrefixes = new String[]{};
+	public static String[] blockPrefixes = new String[]{"ore"};
 	public static String[] suffixes = new String[]{"copper", "tin", "silver", "nickel", "tungsten", "platinum", "titanium", "magnesium", "aluminum", "uranium", "iridium"};
 	
     @Instance(MaterialWarehouse.modID)

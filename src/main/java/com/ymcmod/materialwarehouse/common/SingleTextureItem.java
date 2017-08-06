@@ -1,54 +1,44 @@
 package com.ymcmod.materialwarehouse.common;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.util.IIcon;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-import com.ymcmod.materialwarehouse.MaterialWarehouse;
-import com.ymcmod.materialwarehouse.client.CustomModelLoader;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-public final class SingleTextureItem extends GenericItem{	
-	private static final LinkedList<SingleTextureItem> registeredSTI = new LinkedList();
-	/**
-	 * Total number of registered STI
-	 */
-	private static int count = 0;
-	
-	private final String itemName;
-	private final int index;
+public final class SingleTextureItem extends GenericItem{		
+	private final String[] subNames;
+	private final IIcon[] iconCache;
 	
 	public SingleTextureItem(String name, String[] subNames) {
-		super(name, subNames);
+		super(name, true);
 		
-		this.itemName = name;
-		this.index = count;
-		this.count++;
-		registeredSTI.add(this);
+		this.subNames = subNames;
+		this.iconCache = new IIcon[subNames.length];
 	}
 	
-	public static Iterator<SingleTextureItem> iterator(){
-		return registeredSTI.iterator();
+	@Override
+    public String[] getSubItemUnlocalizedNames(){
+    	return subNames;
+    }
+
+	@Override
+	public void beforeRegister() {
+
 	}
 	
-	@SideOnly(Side.CLIENT)
-	public String getFakeInventoryModelName(int i){
-		return MaterialWarehouse.modID + ":" + CustomModelLoader.invSTI + "_" + String.valueOf(this.index) + "_" + String.valueOf(i);
-	}
-	
-	@SideOnly(Side.CLIENT)
-	public static String[][] texturePaths;
-	
-	@SideOnly(Side.CLIENT)
-	public void updateTexturePaths(){
-		texturePaths[index] = new String[subNames.length];
+	@Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IIconRegister r)	{
 		for (int i=0; i<subNames.length; i++)
-			texturePaths[index][i] = this.itemName + "_" + this.subNames[i];
-	}
+			iconCache[i] = r.registerIcon("material_warehouse:" + this.registryName + "_" + subNames[i]);
+    }
 	
-	@SideOnly(Side.CLIENT)
-	public static void initTexturePathArray(){
-		texturePaths = new String[count][];
-	}
+    /**
+     * Gets an icon index based on an item's damage value
+     */
+    @SideOnly(Side.CLIENT)
+    public IIcon getIconFromDamage(int dmg)
+    {
+        return iconCache[dmg];
+    }
 }

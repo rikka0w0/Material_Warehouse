@@ -3,13 +3,13 @@ package com.ymcmod.materialwarehouse.common;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.ymcmod.materialwarehouse.MaterialWarehouse;
-import com.ymcmod.materialwarehouse.client.CustomModelLoader;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.IIcon;
 
 /**
  * A set of blocks (up to 16), each block has their own texture, and all six sides display the same texture
@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * Texture file: blockName_subName.png, ModelResourceLocation: simple_texture_block_setName_blockIndex_meta
  * @author Rikka0_0
  */
-public final class SingleTextureBlock extends GenericMetaBlock{
+public final class SingleTextureBlock extends GenericBlock implements ISubBlock{
 	public static final class Set{
 		private static final LinkedList<SingleTextureBlock.Set> registeredSTBSets = new LinkedList();
 		
@@ -94,25 +94,25 @@ public final class SingleTextureBlock extends GenericMetaBlock{
 	private final SingleTextureBlock.Set parent;
 	private final String blockName;
 	private final int index;
+	private final String[] subNames;
 	
 	private static SingleTextureBlock create(SingleTextureBlock.Set parent, String name, int blockIndex, String[] subNames, Material material){
 		subNamesLengthCache = subNames.length;
 		SingleTextureBlock instance = new SingleTextureBlock(parent, name, blockIndex, subNames, material);
+		instance.setCreativeTab(parent.tab);
 		return instance;
 	}
 	
 	private SingleTextureBlock(SingleTextureBlock.Set parent, String name, int blockIndex, String[] subNames, Material material) {
-		super(name + "_" + String.valueOf(blockIndex), subNames, SingleTextureItemBlock.class, material);
-		this.setCreativeTab(parent.tab);
+		super(name + "_" + String.valueOf(blockIndex), SingleTextureItemBlock.class, material);
+		this.subNames = subNames;
+		
 		this.blockName = name;
 		this.parent = parent;
 		this.index = count;
 		this.count++;
-	}
-
-	@Override
-	protected int getNumberOfSubBlocksDuringInit() {
-		return subNamesLengthCache;
+		
+		iconBuffer = new IIcon[subNames.length];
 	}
 	
 	public int getTextureIndex(){
@@ -122,32 +122,30 @@ public final class SingleTextureBlock extends GenericMetaBlock{
 	public String getBlockName(){
 		return this.blockName;
 	}
-	
-	/**
-	 * 
-	 * @param i
-	 * @return "material_warehouse:fakeinv_stb_index_i"
-	 */
-	@SideOnly(Side.CLIENT)
-	public String getFakeInventoryModelName(int i){
-		return MaterialWarehouse.modID + ":" + CustomModelLoader.invSTBBlockState + "_" + String.valueOf(this.index) + "_" + String.valueOf(i);
+
+	@Override
+	public String[] getSubBlockUnlocalizedNames() {
+		return subNames;
 	}
 	
-	/**
-	 * texturePath = [index][meta]
-	 */
-	@SideOnly(Side.CLIENT)
-	public static String[][] texturePaths;
-	
-	@SideOnly(Side.CLIENT)
-	public void updateTexturePaths(){
-		texturePaths[index] = new String[subNames.length];
-		for (int i=0; i<subNames.length; i++)
-			texturePaths[index][i] = this.blockName + "_" + this.subNames[i];
+	@Override
+	public void beforeRegister(){
+		
 	}
 	
-	@SideOnly(Side.CLIENT)
-	public static void initTexturePathArray(){
-		texturePaths = new String[count][];
+	//[meta][side]
+	protected final IIcon[] iconBuffer;
+	@Override
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister iconRegister) {
+		for (int i=0; i<subNames.length; i++){
+			iconBuffer[i] = iconRegister.registerIcon("material_warehouse:" + parent.name + "_" + subNames[i]);
+		}
 	}
+	
+	@Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int meta){
+    	return iconBuffer[meta];
+    }
 }

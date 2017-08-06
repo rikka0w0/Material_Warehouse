@@ -15,7 +15,7 @@ public class BlockRegistry {
 			String prefix = MaterialWarehouse.blockPrefixes[i];
 			
 			SingleTextureBlock.Set set = new SingleTextureBlock.Set(prefix, MaterialWarehouse.suffixes,
-					 Material.ROCK, MaterialWarehouse.creativeTab);
+					 Material.rock, MaterialWarehouse.creativeTab);
 			
 			//Register oreDict
 			for (int j=0; j<MaterialWarehouse.suffixes.length; j++){

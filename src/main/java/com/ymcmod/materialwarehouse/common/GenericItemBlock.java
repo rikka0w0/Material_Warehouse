@@ -7,8 +7,10 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 public class GenericItemBlock extends ItemBlock{
-	public GenericItemBlock(Block block, boolean hasSubBlocks) {
+	public GenericItemBlock(Block block) {
         super(block);
+        
+        boolean hasSubBlocks = block instanceof ISubBlock;
         
         if (!(block instanceof GenericBlock))
         	throw new RuntimeException("GenericItemBlock should be used with GenericBlock!");
@@ -23,8 +25,8 @@ public class GenericItemBlock extends ItemBlock{
     @Override
     public String getUnlocalizedName(ItemStack itemstack) {
     	if (this.getHasSubtypes()){
-    		GenericBlock block = (GenericBlock)this.block;
-        	String[] subBlockUnlocalizedNames = block.getSubBlockUnlocalizedNames();
+    		GenericBlock block = (GenericBlock)this.field_150939_a;
+        	String[] subBlockUnlocalizedNames = ((ISubBlock) block).getSubBlockUnlocalizedNames();
             return super.getUnlocalizedName() + "." + subBlockUnlocalizedNames[itemstack.getItemDamage()];
     	}
     	else{
