@@ -7,24 +7,24 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 public class GenericItemBlock extends ItemBlock{
-	public GenericItemBlock(Block block, boolean hasSubBlocks) {
-        super(block);
-        
-        if (!(block instanceof GenericBlock))
-        	throw new RuntimeException("GenericItemBlock should be used with GenericBlock!");
-        
-        setHasSubtypes(hasSubBlocks);
-        
-		if (hasSubBlocks)
+
+	public GenericItemBlock(Block block) {
+		this(block, block instanceof ISubBlock);
+	}
+	
+	public GenericItemBlock(Block block, boolean hasSubItems) {
+		super(block);
+		
+		this.setHasSubtypes(hasSubItems);
+		
+		if (hasSubItems)
 			this.setMaxDamage(0);	//The item can not be damaged
 	}
-
 	
     @Override
     public String getUnlocalizedName(ItemStack itemstack) {
     	if (this.getHasSubtypes()){
-    		GenericBlock block = (GenericBlock)this.block;
-        	String[] subBlockUnlocalizedNames = block.getSubBlockUnlocalizedNames();
+        	String[] subBlockUnlocalizedNames = ((ISubBlock)this.block).getSubBlockUnlocalizedNames();
             return super.getUnlocalizedName() + "." + subBlockUnlocalizedNames[itemstack.getItemDamage()];
     	}
     	else{

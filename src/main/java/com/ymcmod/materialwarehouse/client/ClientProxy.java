@@ -1,15 +1,14 @@
 package com.ymcmod.materialwarehouse.client;
 
+import com.ymcmod.materialwarehouse.BlockRegistry;
 import com.ymcmod.materialwarehouse.CommonProxy;
-import com.ymcmod.materialwarehouse.common.GenericBlock;
+import com.ymcmod.materialwarehouse.MaterialWarehouse;
+import com.ymcmod.materialwarehouse.common.SingleTextureBlock;
+import com.ymcmod.materialwarehouse.common.SingleTextureItem;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy extends CommonProxy{
 	@Override
@@ -23,10 +22,21 @@ public class ClientProxy extends CommonProxy{
 	}
 	
 	@Override
-	public void registerRenders() {		
-		ModelLoaderRegistry.registerLoader(CustomModelLoader.instance);
+	public void registerRenders() {
+		CustomModelLoader mdlLoader = new CustomModelLoader(MaterialWarehouse.modID);
 		
-		SingleTextureMeshDefinition.registerForItemBlocks();
-		SingleTextureMeshDefinition.registerForItems();
+		for (SingleTextureItem item: SingleTextureItem.registeredSTI) {
+			mdlLoader.registerInventoryIcon(item);
+		}
+		
+		SimpleTextureBlockStateMapper stbStateMapper = new SimpleTextureBlockStateMapper(MaterialWarehouse.modID);
+		for (SingleTextureBlock.Set set: SingleTextureBlock.Set.registeredSTBSets) {
+			for (SingleTextureBlock block: set.blocks) {
+				stbStateMapper.registerSingleTextureBlock(block);
+			}
+		}
+		
+		MachineBlockStateMapper mbStateMapper = new MachineBlockStateMapper(MaterialWarehouse.modID);
+		mbStateMapper.register(BlockRegistry.blockMachine);
 	}
 }

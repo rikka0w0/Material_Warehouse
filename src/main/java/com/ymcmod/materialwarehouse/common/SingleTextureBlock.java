@@ -1,40 +1,39 @@
 package com.ymcmod.materialwarehouse.common;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.ymcmod.materialwarehouse.MaterialWarehouse;
-import com.ymcmod.materialwarehouse.client.CustomModelLoader;
+import com.ymcmod.materialwarehouse.client.ISESimpleTextureItem;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-/**
- * A set of blocks (up to 16), each block has their own texture, and all six sides display the same texture
- * <p/>
- * Texture file: blockName_subName.png, ModelResourceLocation: simple_texture_block_setName_blockIndex_meta
- * @author Rikka0_0
- */
-public final class SingleTextureBlock extends GenericMetaBlock{
+public class SingleTextureBlock extends Block implements ISubBlock, ISESimpleTextureItem{
 	public static final class Set{
-		private static final LinkedList<SingleTextureBlock.Set> registeredSTBSets = new LinkedList();
+		public static final LinkedList<SingleTextureBlock.Set> registeredSTBSets = new LinkedList();
 		
-		public static final Iterator<SingleTextureBlock.Set> iterator(){
-			return registeredSTBSets.iterator();
-		}
-		
-		private final String name;	//ore, chunk
-		private final LinkedList<SingleTextureBlock> blocks;
-		private final CreativeTabs tab;
+		public final String name;	//ore, chunk
+		public final LinkedList<SingleTextureBlock> blocks;
+		public final CreativeTabs tab;
 		
 		public Set(String name, String[] subNames, Material material, CreativeTabs tab){
 			this.name = name;
 			this.tab = tab;
 			this.blocks = new LinkedList();
 			
-			int maxBlockIndex = (subNames.length - 1) / 16;
+			int maxBlockIndex = (subNames.length - 1) >> 4;
 			for (int blockIndex = 0; blockIndex <= maxBlockIndex; blockIndex++){
 				int sectionLength = 16;
 				if (blockIndex == maxBlockIndex)
@@ -53,21 +52,6 @@ public final class SingleTextureBlock extends GenericMetaBlock{
 			registeredSTBSets.add(this);
 		}
 		
-		public Iterator<SingleTextureBlock> blockIterator(){
-			return this.blocks.iterator();
-		}
-		
-		public String getName(){
-			return this.name;
-		}
-		
-		/**
-		 * Meta < 16, max 15 (0x0F)
-		 */
-		public int getMeta(int i){
-			return i&15;
-		}
-		
 		public SingleTextureBlock getBlock(int i){
 			int counter = 0;
 			SingleTextureBlock ret = null;
@@ -80,20 +64,14 @@ public final class SingleTextureBlock extends GenericMetaBlock{
 			
 			return ret;
 		}
+		
+		/**
+		 * Meta < 16, max 15 (0x0F)
+		 */
+		public int getMeta(int i){
+			return i&15;
+		}
 	}
-	
-	/**
-	 * Total number of registered STB
-	 */
-	private static int count = 0;
-	/**
-	 * Used for initialization only!
-	 */
-	private static int subNamesLengthCache;
-	
-	private final SingleTextureBlock.Set parent;
-	private final String blockName;
-	private final int index;
 	
 	private static SingleTextureBlock create(SingleTextureBlock.Set parent, String name, int blockIndex, String[] subNames, Material material){
 		subNamesLengthCache = subNames.length;
@@ -101,53 +79,103 @@ public final class SingleTextureBlock extends GenericMetaBlock{
 		return instance;
 	}
 	
+	/**
+	 * Used for initialization only!
+	 */
+	private static int subNamesLengthCache;
+	
+	private final String blockName;
+	protected final String[] subNames;
+	protected final ItemBlock itemBlock;
+	
 	private SingleTextureBlock(SingleTextureBlock.Set parent, String name, int blockIndex, String[] subNames, Material material) {
-		super(name + "_" + String.valueOf(blockIndex), subNames, SingleTextureItemBlock.class, material);
-		this.setCreativeTab(parent.tab);
+		super(material);
 		this.blockName = name;
-		this.parent = parent;
-		this.index = count;
-		this.count++;
+		name = name + "_" + String.valueOf(blockIndex);
+        this.subNames = subNames;
+        this.setUnlocalizedName(name);
+        this.setRegistryName(name);				//Key!
+        this.setCreativeTab(parent.tab);
+        
+        GameRegistry.register(this);
+        
+        this.itemBlock = new GenericItemBlock(this, subNames.length > 1);
+        GameRegistry.register(this.itemBlock, this.getRegistryName());
+        
+        this.setDefaultState(this.blockState.getBaseState().withProperty(getPropertyMeta(), 0));
+	}
+	
+	@Override
+	public String[] getSubBlockUnlocalizedNames() {
+		return subNames;
+	}
+	
+	@Override
+    public String getUnlocalizedName() {
+        return "tile." + blockName;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+	public String getIconName(int damage) {
+		return blockName + "_" + subNames[damage];
 	}
 
+    @Override
+    @SideOnly(Side.CLIENT)
+    public final void getSubBlocks(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems){
+    	if (itemBlock.getHasSubtypes()){
+            for (int ix = 0; ix < getSubBlockUnlocalizedNames().length; ix++)
+                subItems.add(new ItemStack(this, 1, ix));
+    	}else{
+    		super.getSubBlocks(itemIn, tab, subItems);
+    	}
+    }
+	
 	@Override
-	protected int getNumberOfSubBlocksDuringInit() {
-		return subNamesLengthCache;
+	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state){
+	    return new ItemStack(itemBlock, 1, this.getMetaFromState(state));
 	}
-	
-	public int getTextureIndex(){
-		return this.index;
-	}
-	
-	public String getBlockName(){
-		return this.blockName;
-	}
-	
-	/**
-	 * 
-	 * @param i
-	 * @return "material_warehouse:fakeinv_stb_index_i"
-	 */
-	@SideOnly(Side.CLIENT)
-	public String getFakeInventoryModelName(int i){
-		return MaterialWarehouse.modID + ":" + CustomModelLoader.invSTBBlockState + "_" + String.valueOf(this.index) + "_" + String.valueOf(i);
+    
+    public final ItemBlock getItemBlock(){
+    	return this.itemBlock;
+    }
+    
+
+    ///////////////////////////
+    /// BlockState
+    ///////////////////////////
+    public IProperty<Integer> propertyMeta = null;
+    
+	@Override
+	protected final BlockStateContainer createBlockState(){
+		return new BlockStateContainer(this, new IProperty[] {new PropertyMeta(subNamesLengthCache)});
 	}
 	
 	/**
-	 * texturePath = [index][meta]
+	 * Before the initialization is done, propertyMeta is null,
+	 * @return @NonNullable propertyMeta
 	 */
-	@SideOnly(Side.CLIENT)
-	public static String[][] texturePaths;
-	
-	@SideOnly(Side.CLIENT)
-	public void updateTexturePaths(){
-		texturePaths[index] = new String[subNames.length];
-		for (int i=0; i<subNames.length; i++)
-			texturePaths[index][i] = this.blockName + "_" + this.subNames[i];
+	public final IProperty<Integer> getPropertyMeta(){
+		if (propertyMeta == null)
+			propertyMeta = (IProperty<Integer>) this.blockState.getProperty("meta");
+		return propertyMeta;
 	}
 	
-	@SideOnly(Side.CLIENT)
-	public static void initTexturePathArray(){
-		texturePaths = new String[count][];
+	@Override
+    public final IBlockState getStateFromMeta(int meta){
+        return super.getDefaultState().withProperty(getPropertyMeta(), meta & 15);
+    }
+	
+	@Override
+    public final int getMetaFromState(IBlockState state){
+		int meta = state.getValue(getPropertyMeta());
+		meta = meta & 15;
+		return meta;
+    }
+	
+	@Override
+	public final int damageDropped(IBlockState state) {
+	    return getMetaFromState(state);
 	}
 }

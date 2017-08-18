@@ -1,12 +1,15 @@
 package com.ymcmod.materialwarehouse;
 
 import com.ymcmod.materialwarehouse.common.SingleTextureBlock;
+import com.ymcmod.materialwarehouse.machine.BlockMachine;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class BlockRegistry {
+	public static BlockMachine blockMachine;
+	
 	/**
 	 * Register blocks and add them to oreDict
 	 */
@@ -28,6 +31,8 @@ public class BlockRegistry {
 						new ItemStack(set.getBlock(j), 1, set.getMeta(j)));
 			}
 		}
+		
+		blockMachine = new BlockMachine();
 	}
 	
 	/**

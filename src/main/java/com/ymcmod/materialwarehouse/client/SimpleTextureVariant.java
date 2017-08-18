@@ -1,9 +1,6 @@
-package com.ymcmod.materialwarehouse.client.model;
+package com.ymcmod.materialwarehouse.client;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -11,18 +8,18 @@ import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.block.model.Variant;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.ISmartVariant;
 import net.minecraftforge.client.model.ModelProcessingHelper;
-import net.minecraftforge.client.model.MultiModel;
-import net.minecraftforge.client.model.BlockStateLoader.SubModel;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * A block variant has the same texture for all 6 sides
+ * A block variant uses the same texture for all 6 sides / An item with single texture
  * @author Rikka0_0
  */
-public class SingleTextureVariant extends Variant implements ISmartVariant{
+@SideOnly(Side.CLIENT)
+public class SimpleTextureVariant extends Variant{
 	private static final ResourceLocation generated = new ResourceLocation("minecraft:item/generated");
 	private static final ResourceLocation cube_all = new ResourceLocation("minecraft:block/cube_all");
 	
@@ -31,18 +28,26 @@ public class SingleTextureVariant extends Variant implements ISmartVariant{
     private final IModelState state;
     private final boolean isGui3d;
     
-    public SingleTextureVariant(String texture, boolean isBlock){
+    /**
+     * @param texture the REAL texture path, e.g. sime:tool_multimeter
+     * @param isBlock
+     */
+    public SimpleTextureVariant(String texture, boolean isBlock){
     	this(TRSRTransformation.identity(), texture, isBlock);
     }
     
-    private SingleTextureVariant(IModelState state, String texture, boolean isBlock) {
+    private SimpleTextureVariant(IModelState state, String texture, boolean isBlock) {
 		super(isBlock?cube_all:generated
 			, state instanceof ModelRotation ? (ModelRotation)state : ModelRotation.X0_Y0
 			, false, 1);	//uvLock = false, weight always 1
+
 		
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
 		builder.put(isBlock?"all":"layer0", texture);
+		
 		this.textures = builder.build();
+		
+		
 		this.customData = ImmutableMap.copyOf(new HashMap<String, String>());
         this.state = state;
         this.isGui3d = isBlock;

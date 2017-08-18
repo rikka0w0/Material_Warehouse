@@ -1,6 +1,6 @@
 package com.ymcmod.materialwarehouse.client;
 
-import com.ymcmod.materialwarehouse.common.SingleTextureBlock;
+import com.ymcmod.materialwarehouse.machine.BlockMachine;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -13,11 +13,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class SimpleTextureBlockStateMapper extends StateMapperBase{
-	public final static String VPATH = "virtual/blockstates/stb";
+public class MachineBlockStateMapper extends StateMapperBase{
+	public final static String VPATH = "virtual/blockstates/mb";
 	public final String domain;
 	
-	public SimpleTextureBlockStateMapper(String domain){
+	public MachineBlockStateMapper(String domain){
 		this.domain = domain;
 	}
 
@@ -25,16 +25,21 @@ public class SimpleTextureBlockStateMapper extends StateMapperBase{
 	protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
 		Block block = state.getBlock();
 		
-		if (block instanceof SingleTextureBlock) {
-			int meta = block.getMetaFromState(state);
-			String textureName = ((SingleTextureBlock) block).getIconName(meta);
+		if (block instanceof BlockMachine){
+			BlockMachine machine = (BlockMachine) block;
+			
+			String modelName = machine.getIconName(state.getValue(BlockMachine.propertyType));
+			boolean has2State = true;
+			
+			String varStr = (has2State ? "2" : "1") + modelName;
 			
 			ModelResourceLocation res = new ModelResourceLocation(
 					this.domain + ":" + VPATH,
-					textureName
+					varStr
 					);
 			return res;
 		}
+		
 		return null;
 	}
 
@@ -43,14 +48,17 @@ public class SimpleTextureBlockStateMapper extends StateMapperBase{
 	}
 	
 	public static IModel loadModel(String domain, String resPath, String variantStr) throws Exception {
-		return new SingleTextureModel(domain, variantStr, true);	//SimpleTextureItem
+		boolean has2State = variantStr.startsWith("2");
+		variantStr = variantStr.substring(1);
+		IModel model = new MachineRawModel(domain, variantStr, has2State);
+		return model;
 	}
 	
-	public void registerSingleTextureBlock(SingleTextureBlock block) {
+	public void register(BlockMachine block){
 		ModelLoader.setCustomStateMapper(block, this);
 		
-		ItemBlock itemBlock = block.getItemBlock();
-		for (int meta: block.propertyMeta.getAllowedValues()){
+		ItemBlock itemBlock = block.itemBlock;
+		for (int meta: block.propertyType.getAllowedValues()){
 			IBlockState blockState = block.getStateFromMeta(meta);
 			ModelResourceLocation res = this.getModelResourceLocation(blockState);
 			//Also register inventory variants here

@@ -22,7 +22,7 @@ public class MaterialWarehouse {
 	 * tile.material_warehouse:block_iron.name=My Iron Block
 	*/
 	public static String[] itemPrefixes = new String[]{"ingot", "plate", "dust", "dustSmall", "dustTiny", "nugget", "crushed"};
-	public static String[] blockPrefixes = new String[]{};
+	public static String[] blockPrefixes = new String[]{"ore", "block"};
 	public static String[] suffixes = new String[]{"copper", "tin", "silver", "nickel", "tungsten", "platinum", "titanium", "magnesium", "aluminum", "uranium", "iridium"};
 	
     @Instance(MaterialWarehouse.modID)
