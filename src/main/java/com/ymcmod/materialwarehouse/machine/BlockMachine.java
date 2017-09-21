@@ -1,22 +1,16 @@
 package com.ymcmod.materialwarehouse.machine;
 
-import com.ymcmod.materialwarehouse.MaterialWarehouse;
-import com.ymcmod.materialwarehouse.client.ISESimpleTextureItem;
-import com.ymcmod.materialwarehouse.common.GenericItemBlock;
-import com.ymcmod.materialwarehouse.common.ISubBlock;
-import com.ymcmod.materialwarehouse.common.PropertyMeta;
+import java.util.ArrayList;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
+import com.ymcmod.materialwarehouse.MaterialWarehouse;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -25,42 +19,33 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import rikka.librikka.block.MetaBlock;
+import rikka.librikka.item.ISimpleTexture;
+import rikka.librikka.item.ItemBlockBase;
 
-public class BlockMachine extends Block implements ITileEntityProvider, ISubBlock, ISESimpleTextureItem{
+public class BlockMachine extends MetaBlock implements ISimpleTexture{
 	public final static String[] subNames = new String[] {"metal_melter"};
 	
-	public final ItemBlock itemBlock;
-	
 	public BlockMachine() {
-        super(Material.ROCK);
-        String unlocalizedName = "ymcmw_machine";
-        this.setUnlocalizedName(unlocalizedName);
-        this.setRegistryName(unlocalizedName);				//Key!
-        this.setCreativeTab(MaterialWarehouse.creativeTab);
+        super("ymcmw_machine", subNames, Material.ROCK, ItemBlockBase.class);
+        setCreativeTab(MaterialWarehouse.creativeTab);
         
-        GameRegistry.register(this);
-        
-        this.itemBlock = new GenericItemBlock(this, true);
-        GameRegistry.register(this.itemBlock, this.getRegistryName());
-        
-        this.setDefaultState(this.blockState.getBaseState()
-        		.withProperty(propertyType, 0)
-        		.withProperty(propertyFacing, EnumFacing.NORTH));
+        propertyType = this.getPropertyMeta();
 	}
-
-	@Override
-	public String[] getSubBlockUnlocalizedNames() {
-		return subNames;
-	}
-
+	
 	@Override
 	public String getIconName(int damage) {
 		return subNames[damage];
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity(IBlockState state) {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(World worldIn, IBlockState meta) {
 		return null;
 	}
 	
@@ -96,13 +81,15 @@ public class BlockMachine extends Block implements ITileEntityProvider, ISubBloc
     ///////////////////////////
     /// BlockState
     ///////////////////////////
-    public final static IProperty<Integer> propertyType = new PropertyMeta("type", subNames.length);
+    public static IProperty<Integer> propertyType;
     public final static IProperty<Boolean> propertyWorking = PropertyBool.create("working");
     public final static IProperty<EnumFacing> propertyFacing = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     
 	@Override
-	protected final BlockStateContainer createBlockState(){
-		return new BlockStateContainer(this, new IProperty[] {propertyType, propertyFacing, propertyWorking});
+	protected void createProperties(ArrayList<IProperty> properties, ArrayList<IUnlistedProperty> unlisted) {
+		super.createProperties(properties, unlisted);
+		properties.add(propertyFacing);
+		properties.add(propertyWorking);
 	}
 	
 	@Override
@@ -110,13 +97,13 @@ public class BlockMachine extends Block implements ITileEntityProvider, ISubBloc
 		int type = meta & 3;
 		int facing = ((meta>>2) & 3) + 2;
         return super.getDefaultState()
-        		.withProperty(propertyType, type)
+        		.withProperty(getPropertyMeta(), type)
         		.withProperty(propertyFacing, EnumFacing.getFront(facing));
     }
 	
 	@Override
     public final int getMetaFromState(IBlockState state){
-		int type = state.getValue(propertyType);
+		int type = state.getValue(getPropertyMeta());
 		int facing = state.getValue(propertyFacing).ordinal() - 2;
 		int meta = (facing<<2)&12 | (type&3);
 		return meta;

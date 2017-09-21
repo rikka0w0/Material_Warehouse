@@ -2,9 +2,10 @@ package com.ymcmod.materialwarehouse.common;
 
 import java.util.LinkedList;
 
-import com.ymcmod.materialwarehouse.client.ISESimpleTextureItem;
+import rikka.librikka.item.ISimpleTexture;
+import rikka.librikka.item.ItemBase;
 
-public final class SingleTextureItem extends GenericItem implements ISESimpleTextureItem{	
+public final class SingleTextureItem extends ItemBase implements ISimpleTexture{	
 	public static final LinkedList<SingleTextureItem> registeredSTI = new LinkedList();
 	/**
 	 * Total number of registered STI
@@ -25,11 +26,6 @@ public final class SingleTextureItem extends GenericItem implements ISESimpleTex
 		this.count++;
 		registeredSTI.add(this);
 	}
-
-	@Override
-	public void beforeRegister() {
-
-	}
 	
     public String[] getSubItemUnlocalizedNames(){
     	return subNames;
@@ -38,5 +34,11 @@ public final class SingleTextureItem extends GenericItem implements ISESimpleTex
 	@Override
 	public String getIconName(int damage) {
 		return itemName + "_" + subNames[damage];
+	}
+	
+	public String getOreDictName(int damage) {
+		String suffix = subNames[damage];
+		suffix = suffix.substring(0, 1).toUpperCase() + suffix.substring(1);
+		return itemName.toLowerCase() + suffix;
 	}
 }

@@ -1,15 +1,18 @@
 package com.ymcmod.materialwarehouse;
 
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.IForgeRegistry;
 
-@Mod(modid = MaterialWarehouse.modID, name = MaterialWarehouse.modName, version = MaterialWarehouse.version)
+@Mod(modid = MaterialWarehouse.MODID, name = MaterialWarehouse.modName, version = MaterialWarehouse.version)
 public class MaterialWarehouse {
-	public static final String modID = "material_warehouse";
+	public static final String MODID = "material_warehouse";
 	public static final String modName = "Material Warehouse";
 	public static final String version = "1.0";
 	
@@ -25,21 +28,47 @@ public class MaterialWarehouse {
 	public static String[] blockPrefixes = new String[]{"ore", "block"};
 	public static String[] suffixes = new String[]{"copper", "tin", "silver", "nickel", "tungsten", "platinum", "titanium", "magnesium", "aluminum", "uranium", "iridium"};
 	
-    @Instance(MaterialWarehouse.modID)
+    @Instance(MaterialWarehouse.MODID)
     public static MaterialWarehouse instance;
     
-    @SidedProxy(clientSide="com.ymcmod.materialwarehouse.client.ClientProxy", serverSide="com.ymcmod.materialwarehouse.CommonProxy") 
+    @SidedProxy(clientSide="com.ymcmod.materialwarehouse.ClientProxy", serverSide="com.ymcmod.materialwarehouse.CommonProxy") 
     public static CommonProxy proxy;
     
     public static CreativeTabs creativeTab;
     
-    @EventHandler
+    @Mod.EventBusSubscriber(modid = MaterialWarehouse.MODID)
+    public static class RegistrationHandler {
+    	@SubscribeEvent
+    	public static void newRegistry(RegistryEvent.NewRegistry event) {
+    		creativeTab = new CreativeTab();
+    	}
+    
+    	@SubscribeEvent
+		public static void registerBlocks(RegistryEvent.Register<Block> event) {
+    		IForgeRegistry registry = event.getRegistry();
+    		BlockRegistry.initBlocks();
+    		BlockRegistry.registerBlocks(registry, false);
+    	}
+    	
+    	@SubscribeEvent
+		public static void registerItems(RegistryEvent.Register<Item> event) {
+    		IForgeRegistry registry = event.getRegistry();
+    		ItemRegistry.initItems();
+    		BlockRegistry.registerBlocks(registry, true);
+    		ItemRegistry.registerItems(registry);
+    		
+    		BlockRegistry.registerOreDict();
+    		ItemRegistry.registerOreDict();
+    	}
+    }
+    
+/*    @EventHandler
     public void preInit(FMLPreInitializationEvent event){
-    	creativeTab = new CreativeTab();
+    	
     	
     	ItemRegistry.preInit();
     	BlockRegistry.preInit();
     	
     	proxy.registerRenders();
-    }
+    }*/
 }

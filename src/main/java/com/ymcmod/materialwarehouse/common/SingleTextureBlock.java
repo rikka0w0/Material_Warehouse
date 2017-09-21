@@ -2,29 +2,19 @@ package com.ymcmod.materialwarehouse.common;
 
 import java.util.LinkedList;
 
-import com.ymcmod.materialwarehouse.client.ISESimpleTextureItem;
-
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import rikka.librikka.block.MetaBlock;
+import rikka.librikka.item.ISimpleTexture;
+import rikka.librikka.item.ItemBlockBase;
 
-public class SingleTextureBlock extends Block implements ISubBlock, ISESimpleTextureItem{
+public class SingleTextureBlock extends MetaBlock implements ISimpleTexture{
 	public static final class Set{
 		public static final LinkedList<SingleTextureBlock.Set> registeredSTBSets = new LinkedList();
 		
-		public final String name;	//ore, chunk
+		public final String name;	//ore, block, ...
 		public final LinkedList<SingleTextureBlock> blocks;
 		public final CreativeTabs tab;
 		
@@ -85,97 +75,17 @@ public class SingleTextureBlock extends Block implements ISubBlock, ISESimpleTex
 	private static int subNamesLengthCache;
 	
 	private final String blockName;
-	protected final String[] subNames;
-	protected final ItemBlock itemBlock;
 	
 	private SingleTextureBlock(SingleTextureBlock.Set parent, String name, int blockIndex, String[] subNames, Material material) {
-		super(material);
+		super(name + "_" + String.valueOf(blockIndex), subNames, material, ItemBlockBase.class);
 		this.blockName = name;
 		name = name + "_" + String.valueOf(blockIndex);
-        this.subNames = subNames;
-        this.setUnlocalizedName(name);
-        this.setRegistryName(name);				//Key!
         this.setCreativeTab(parent.tab);
-        
-        GameRegistry.register(this);
-        
-        this.itemBlock = new GenericItemBlock(this, subNames.length > 1);
-        GameRegistry.register(this.itemBlock, this.getRegistryName());
-        
-        this.setDefaultState(this.blockState.getBaseState().withProperty(getPropertyMeta(), 0));
 	}
-	
-	@Override
-	public String[] getSubBlockUnlocalizedNames() {
-		return subNames;
-	}
-	
-	@Override
-    public String getUnlocalizedName() {
-        return "tile." + blockName;
-    }
 
     @Override
     @SideOnly(Side.CLIENT)
 	public String getIconName(int damage) {
-		return blockName + "_" + subNames[damage];
-	}
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public final void getSubBlocks(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems){
-    	if (itemBlock.getHasSubtypes()){
-            for (int ix = 0; ix < getSubBlockUnlocalizedNames().length; ix++)
-                subItems.add(new ItemStack(this, 1, ix));
-    	}else{
-    		super.getSubBlocks(itemIn, tab, subItems);
-    	}
-    }
-	
-	@Override
-	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state){
-	    return new ItemStack(itemBlock, 1, this.getMetaFromState(state));
-	}
-    
-    public final ItemBlock getItemBlock(){
-    	return this.itemBlock;
-    }
-    
-
-    ///////////////////////////
-    /// BlockState
-    ///////////////////////////
-    public IProperty<Integer> propertyMeta = null;
-    
-	@Override
-	protected final BlockStateContainer createBlockState(){
-		return new BlockStateContainer(this, new IProperty[] {new PropertyMeta(subNamesLengthCache)});
-	}
-	
-	/**
-	 * Before the initialization is done, propertyMeta is null,
-	 * @return @NonNullable propertyMeta
-	 */
-	public final IProperty<Integer> getPropertyMeta(){
-		if (propertyMeta == null)
-			propertyMeta = (IProperty<Integer>) this.blockState.getProperty("meta");
-		return propertyMeta;
-	}
-	
-	@Override
-    public final IBlockState getStateFromMeta(int meta){
-        return super.getDefaultState().withProperty(getPropertyMeta(), meta & 15);
-    }
-	
-	@Override
-    public final int getMetaFromState(IBlockState state){
-		int meta = state.getValue(getPropertyMeta());
-		meta = meta & 15;
-		return meta;
-    }
-	
-	@Override
-	public final int damageDropped(IBlockState state) {
-	    return getMetaFromState(state);
+		return blockName + "_" + getSubBlockUnlocalizedNames()[damage];
 	}
 }

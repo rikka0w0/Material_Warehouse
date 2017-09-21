@@ -11,9 +11,10 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import rikka.librikka.model.loader.IModelLoader;
 
 @SideOnly(Side.CLIENT)
-public class MachineBlockStateMapper extends StateMapperBase{
+public class MachineBlockStateMapper extends StateMapperBase implements IModelLoader {
 	public final static String VPATH = "virtual/blockstates/mb";
 	public final String domain;
 	
@@ -43,11 +44,13 @@ public class MachineBlockStateMapper extends StateMapperBase{
 		return null;
 	}
 
-	public static boolean accepts(String resPath){
+	@Override
+	public boolean accepts(String resPath){
 		return resPath.startsWith(VPATH);
 	}
 	
-	public static IModel loadModel(String domain, String resPath, String variantStr) throws Exception {
+	@Override
+	public IModel loadModel(String domain, String resPath, String variantStr) throws Exception {
 		boolean has2State = variantStr.startsWith("2");
 		variantStr = variantStr.substring(1);
 		IModel model = new MachineRawModel(domain, variantStr, has2State);
